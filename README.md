@@ -14,4 +14,4 @@ open http://localhost:3000
 
 ## Groupe (L2 MIASHS - IDMC)
 - Mawadda AL MASHDALI
-- Raimas AL MASHDALI
+- Jazzia Chilla
