@@ -1,6 +1,7 @@
-import { Hono } from 'hono'
+import { Hono } from "hono";
+import { matchs } from "./mock/matchs";
 
-const app = new Hono()
+const app = new Hono();
 
 app.get("/", (c) => {
   return c.json({
@@ -18,4 +19,31 @@ app.get("/health", (c) => {
   });
 });
 
-export { app }
+app.get("/matchs", (c) => {
+  return c.json({
+    success: true,
+    data: matchs,
+  });
+});
+
+app.get("/matchs/:id", (c) => {
+  const id = c.req.param("id");
+  const match = matchs.find((m) => m.id === id);
+
+  if (!match) {
+    return c.json(
+      {
+        success: false,
+        message: "Match not found",
+      },
+      404
+    );
+  }
+
+  return c.json({
+    success: true,
+    data: match,
+  });
+});
+
+export { app };
