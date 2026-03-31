@@ -4,18 +4,39 @@ import { stadiums } from "@infrastructure/mock/stadiums";
 export class GetStadiumsHandler {
   handle(c: Context) {
     const name = c.req.query("name");
+    const cityName = c.req.query("city[name]");
+    const countryName = c.req.query("country[name]");
+    const countryCode = c.req.query("country[code]");
 
-    let filteredStadiums = [...stadiums];
+    let result = [...stadiums];
 
     if (name) {
-      filteredStadiums = filteredStadiums.filter((stadium) =>
+      result = result.filter((stadium) =>
         stadium.name.toLowerCase().includes(name.toLowerCase())
+      );
+    }
+
+    if (cityName) {
+      result = result.filter((stadium) =>
+        stadium.city.name.toLowerCase().includes(cityName.toLowerCase())
+      );
+    }
+
+    if (countryName) {
+      result = result.filter((stadium) =>
+        stadium.city.country.name.toLowerCase().includes(countryName.toLowerCase())
+      );
+    }
+
+    if (countryCode) {
+      result = result.filter((stadium) =>
+        stadium.city.country.code.toLowerCase() === countryCode.toLowerCase()
       );
     }
 
     return c.json({
       success: true,
-      data: filteredStadiums,
+      data: result,
     });
   }
 }
