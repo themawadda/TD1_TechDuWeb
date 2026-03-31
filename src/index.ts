@@ -1,5 +1,5 @@
 import { serve } from "bun";
-import { app } from "./app";
+import { app } from "./infrastructure/app";
 
 const port = Number(process.env.PORT) || 3000;
 
