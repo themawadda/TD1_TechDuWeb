@@ -1,8 +1,8 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { teams } from "@infrastructure/mock/teams";
+import { matchs } from "@infrastructure/mock/matchs";
 
-export class GetTeamByFifaCodeHandler {
+export class GetTeamMatchsByFifaCodeHandler {
   handle(c: Context) {
     const fifaCode = c.req.param("fifaCode").toUpperCase();
 
@@ -10,15 +10,13 @@ export class GetTeamByFifaCodeHandler {
       throw new HTTPException(400, { message: "Invalid FIFA code" });
     }
 
-    const team = teams.find((team) => team.id === fifaCode);
-
-    if (!team) {
-      throw new HTTPException(404, { message: "Team not found" });
-    }
+    const result = matchs.filter(
+      (match) => match.home.id === fifaCode || match.away.id === fifaCode
+    );
 
     return c.json({
       success: true,
-      data: team,
+      data: result,
     });
   }
 }

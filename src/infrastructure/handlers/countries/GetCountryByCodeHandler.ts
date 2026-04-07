@@ -1,5 +1,6 @@
 import { Context } from "hono";
 import { countries } from "@infrastructure/mock/countries";
+import { HTTPException } from "hono/http-exception";
 
 export class GetCountryByCodeHandler {
   handle(c: Context) {
@@ -8,13 +9,7 @@ export class GetCountryByCodeHandler {
     const country = countries.find((country) => country.code === code);
 
     if (!country) {
-      return c.json(
-        {
-          success: false,
-          message: "Country not found",
-        },
-        404
-      );
+      throw new HTTPException(404, { message: "Country not found" });
     }
 
     return c.json(
