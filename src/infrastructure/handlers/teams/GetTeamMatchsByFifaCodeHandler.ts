@@ -1,17 +1,29 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { matchs } from "@infrastructure/mock/matchs";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Match } from "@domain/entities/Match";
+import { FifaCode } from "@domain/value-objects/FifaCode";
 
 export class GetTeamMatchsByFifaCodeHandler {
-  handle(c: Context) {
-    const fifaCode = c.req.param("fifaCode").toUpperCase();
+  async handle(c: Context) {
+    const fifaCodeParam = c.req.param("fifaCode");
 
-    if (!/^[A-Z]{3}$/.test(fifaCode)) {
+    let fifaCode: FifaCode;
+
+    try {
+      fifaCode = new FifaCode(fifaCodeParam);
+    } catch {
       throw new HTTPException(400, { message: "Invalid FIFA code" });
     }
 
-    const result = matchs.filter(
-      (match) => match.home.id === fifaCode || match.away.id === fifaCode
+    const matchRepository = AppDataSource.getRepository(Match);
+
+    const allMatchs = await matchRepository.find();
+
+    const result = allMatchs.filter(
+      (match) =>
+        match.home.fifaCode.toUpperCase() === fifaCode.value ||
+        match.away.fifaCode.toUpperCase() === fifaCode.value
     );
 
     return c.json({

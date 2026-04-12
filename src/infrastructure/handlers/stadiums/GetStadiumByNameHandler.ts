@@ -1,12 +1,16 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { stadiums } from "@infrastructure/mock/stadiums";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Stadium } from "@domain/entities/Stadium";
 
 export class GetStadiumByNameHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const nameParam = c.req.param("name").toLowerCase();
 
-    const stadium = stadiums.find(
+    const stadiumRepository = AppDataSource.getRepository(Stadium);
+
+    const allStadiums = await stadiumRepository.find();
+    const stadium = allStadiums.find(
       (stadium) => stadium.name.toLowerCase() === nameParam
     );
 

@@ -1,21 +1,28 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { stadiums } from "@infrastructure/mock/stadiums";
-import { matchs } from "@infrastructure/mock/matchs";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Stadium } from "@domain/entities/Stadium";
+import { Match } from "@domain/entities/Match";
 
 export class GetStadiumMatchsHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const nameParam = c.req.param("name").toLowerCase();
 
-    const stadium = stadiums.find(
-      (s) => s.name.toLowerCase() === nameParam
+    const stadiumRepository = AppDataSource.getRepository(Stadium);
+    const matchRepository = AppDataSource.getRepository(Match);
+
+    const allStadiums = await stadiumRepository.find();
+    const stadium = allStadiums.find(
+      (stadium) => stadium.name.toLowerCase() === nameParam
     );
 
     if (!stadium) {
       throw new HTTPException(404, { message: "Stadium not found" });
     }
 
-    const result = matchs.filter(
+    const allMatchs = await matchRepository.find();
+
+    const result = allMatchs.filter(
       (match) =>
         match.stadium.name.toLowerCase() === stadium.name.toLowerCase()
     );

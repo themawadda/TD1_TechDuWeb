@@ -1,24 +1,37 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { teams } from "@infrastructure/mock/teams";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Team } from "@domain/entities/Team";
+import { FifaCode } from "@domain/value-objects/FifaCode";
 
 export class GetTeamByFifaCodeHandler {
-  handle(c: Context) {
-    const fifaCode = c.req.param("fifaCode").toUpperCase();
+  async handle(c: Context) {
+    const fifaCodeParam = c.req.param("fifaCode");
 
-    if (!/^[A-Z]{3}$/.test(fifaCode)) {
+    let fifaCode: FifaCode;
+
+    try {
+      fifaCode = new FifaCode(fifaCodeParam);
+    } catch {
       throw new HTTPException(400, { message: "Invalid FIFA code" });
     }
 
-    const team = teams.find((team) => team.id === fifaCode);
+    const teamRepository = AppDataSource.getRepository(Team);
+
+    const team = await teamRepository.findOne({
+      where: { fifaCode: fifaCode.value },
+    });
 
     if (!team) {
       throw new HTTPException(404, { message: "Team not found" });
     }
 
-    return c.json({
-      success: true,
-      data: team,
-    });
+    return c.json(
+      {
+        success: true,
+        data: team,
+      },
+      200
+    );
   }
 }

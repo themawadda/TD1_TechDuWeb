@@ -1,7 +1,9 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { teams } from "@infrastructure/mock/teams";
-import { matchs } from "@infrastructure/mock/matchs";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Team } from "@domain/entities/Team";
+import { Match } from "@domain/entities/Match";
+import { FifaCode } from "@domain/value-objects/FifaCode";
 
 const allowedStages = [
   "group",
@@ -14,11 +16,15 @@ const allowedStages = [
 ] as const;
 
 export class GetTeamMatchsByStageHandler {
-  handle(c: Context) {
-    const fifaCode = c.req.param("fifaCode").toUpperCase();
+  async handle(c: Context) {
+    const fifaCodeParam = c.req.param("fifaCode");
     const stageParam = c.req.param("stage").toLowerCase();
 
-    if (!/^[A-Z]{3}$/.test(fifaCode)) {
+    let fifaCode: FifaCode;
+
+    try {
+      fifaCode = new FifaCode(fifaCodeParam);
+    } catch {
       throw new HTTPException(400, { message: "Invalid FIFA code" });
     }
 
@@ -26,7 +32,12 @@ export class GetTeamMatchsByStageHandler {
       throw new HTTPException(400, { message: "Invalid stage" });
     }
 
-    const team = teams.find((team) => team.id === fifaCode);
+    const teamRepository = AppDataSource.getRepository(Team);
+    const matchRepository = AppDataSource.getRepository(Match);
+
+    const team = await teamRepository.findOne({
+      where: { fifaCode: fifaCode.value },
+    });
 
     if (!team) {
       throw new HTTPException(404, { message: "Team not found" });
@@ -44,9 +55,12 @@ export class GetTeamMatchsByStageHandler {
 
     const normalizedStage = stageMap[stageParam];
 
-    const result = matchs.filter(
+    const allMatchs = await matchRepository.find();
+
+    const result = allMatchs.filter(
       (match) =>
-        (match.home.id === fifaCode || match.away.id === fifaCode) &&
+        (match.home.fifaCode === fifaCode.value ||
+          match.away.fifaCode === fifaCode.value) &&
         match.stage === normalizedStage
     );
 

@@ -1,12 +1,17 @@
 import { Context } from "hono";
-import { countries } from "@infrastructure/mock/countries";
 import { HTTPException } from "hono/http-exception";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Country } from "@domain/entities/Country";
 
 export class GetCountryByCodeHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const code = c.req.param("code").trim().toLowerCase();
 
-    const country = countries.find((country) => country.code === code);
+    const countryRepository = AppDataSource.getRepository(Country);
+
+    const country = await countryRepository.findOne({
+      where: { code },
+    });
 
     if (!country) {
       throw new HTTPException(404, { message: "Country not found" });

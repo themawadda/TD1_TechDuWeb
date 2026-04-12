@@ -1,13 +1,18 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { cities } from "@infrastructure/mock/cities";
-import { matchs } from "@infrastructure/mock/matchs";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { City } from "@domain/entities/City";
+import { Match } from "@domain/entities/Match";
 
 export class GetCityMatchsHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const nameParam = c.req.param("name").toLowerCase();
 
-    const city = cities.find(
+    const cityRepository = AppDataSource.getRepository(City);
+    const matchRepository = AppDataSource.getRepository(Match);
+
+    const allCities = await cityRepository.find();
+    const city = allCities.find(
       (city) => city.name.toLowerCase() === nameParam
     );
 
@@ -15,9 +20,10 @@ export class GetCityMatchsHandler {
       throw new HTTPException(404, { message: "City not found" });
     }
 
-    const result = matchs.filter(
-      (match) =>
-        match.stadium.city.name.toLowerCase() === city.name.toLowerCase()
+    const allMatchs = await matchRepository.find();
+
+    const result = allMatchs.filter(
+      (match) => match.stadium.city.name.toLowerCase() === city.name.toLowerCase()
     );
 
     return c.json({

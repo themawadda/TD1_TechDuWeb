@@ -1,21 +1,29 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { countries } from "@infrastructure/mock/countries";
-import { cities } from "@infrastructure/mock/cities";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Country } from "@domain/entities/Country";
+import { City } from "@domain/entities/City";
 
 export class GetCountryCitiesHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const code = c.req.param("code").toLowerCase();
 
-    const country = countries.find((country) => country.code === code);
+    const countryRepository = AppDataSource.getRepository(Country);
+    const cityRepository = AppDataSource.getRepository(City);
+
+    const country = await countryRepository.findOne({
+      where: { code },
+    });
 
     if (!country) {
       throw new HTTPException(404, { message: "Country not found" });
     }
 
-    const result = cities.filter(
-      (city) => city.country.code === code
-    );
+    const result = await cityRepository.find({
+      where: {
+        country: { code },
+      },
+    });
 
     return c.json({
       success: true,
