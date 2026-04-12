@@ -10,7 +10,8 @@ export class Match {
     public readonly away: Team,
     public readonly stadium: Stadium,
     public readonly status: MatchStatus,
-    public readonly stage: MatchStage
+    public readonly stage: MatchStage,
+    public readonly date: Date
   ) {
     if (!id.trim()) {
       throw new Error("Match id is required");

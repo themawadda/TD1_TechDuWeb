@@ -13,7 +13,8 @@ export const matchs = [
     byId("MEX"),
     stadiums[1],
     MatchStatus.Scheduled,
-    MatchStage.Group
+    MatchStage.Group,
+    new Date("2026-06-15T18:00:00.000Z")
   ),
   new Match(
     "m2",
@@ -21,7 +22,8 @@ export const matchs = [
     byId("BRA"),
     stadiums[0],
     MatchStatus.Scheduled,
-    MatchStage.Group
+    MatchStage.Group,
+    new Date("2026-06-16T18:00:00.000Z")
   ),
   new Match(
     "m3",
@@ -29,6 +31,7 @@ export const matchs = [
     byId("CAN"),
     stadiums[2],
     MatchStatus.Scheduled,
-    MatchStage.Group
+    MatchStage.Group,
+    new Date("2026-06-15T21:00:00.000Z")
   ),
 ];

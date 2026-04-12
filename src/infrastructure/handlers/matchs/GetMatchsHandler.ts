@@ -1,4 +1,5 @@
 import { Context } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { matchs } from "@infrastructure/mock/matchs";
 import { FifaCode } from "@domain/value-objects/FifaCode";
 import { MatchStage } from "@domain/enums/MatchStage";
@@ -7,6 +8,7 @@ export class GetMatchsHandler {
   handle(c: Context) {
     const teamCode = c.req.query("team[code]");
     const stageParam = c.req.query("stage");
+    const dateParam = c.req.query("date");
 
     let result = [...matchs];
 
@@ -16,13 +18,7 @@ export class GetMatchsHandler {
       try {
         fifaCode = new FifaCode(teamCode);
       } catch {
-        return c.json(
-          {
-            success: false,
-            message: "Invalid FIFA code",
-          },
-          400
-        );
+        throw new HTTPException(400, { message: "Invalid FIFA code" });
       }
 
       result = result.filter(
@@ -34,20 +30,25 @@ export class GetMatchsHandler {
 
     if (stageParam) {
       const normalizedStage = stageParam.trim().toUpperCase();
-
       const allowedStages = Object.values(MatchStage);
 
       if (!allowedStages.includes(normalizedStage as MatchStage)) {
-        return c.json(
-          {
-            success: false,
-            message: "Invalid stage",
-          },
-          400
-        );
+        throw new HTTPException(400, { message: "Invalid stage" });
       }
 
       result = result.filter((match) => match.stage === normalizedStage);
+    }
+
+    if (dateParam) {
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+
+      if (!dateRegex.test(dateParam)) {
+        throw new HTTPException(400, { message: "Invalid date format" });
+      }
+
+      result = result.filter(
+        (match) => match.date.toISOString().split("T")[0] === dateParam
+      );
     }
 
     return c.json({
