@@ -1,16 +1,19 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { matchs } from "@infrastructure/mock/matchs";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Match } from "@domain/entities/Match";
 import { FifaCode } from "@domain/value-objects/FifaCode";
 import { MatchStage } from "@domain/enums/MatchStage";
 
 export class GetMatchsHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const teamCode = c.req.query("team[code]");
     const stageParam = c.req.query("stage");
     const dateParam = c.req.query("date");
 
-    let result = [...matchs];
+    const matchRepository = AppDataSource.getRepository(Match);
+
+    let result = await matchRepository.find();
 
     if (teamCode) {
       let fifaCode: FifaCode;
@@ -23,8 +26,8 @@ export class GetMatchsHandler {
 
       result = result.filter(
         (match) =>
-          match.home.id.toUpperCase() === fifaCode.value ||
-          match.away.id.toUpperCase() === fifaCode.value
+          match.home.fifaCode.toUpperCase() === fifaCode.value ||
+          match.away.fifaCode.toUpperCase() === fifaCode.value
       );
     }
 

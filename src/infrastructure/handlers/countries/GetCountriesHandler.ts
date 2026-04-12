@@ -1,21 +1,24 @@
 import { Context } from "hono";
-import { countries } from "@infrastructure/mock/countries";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Country } from "@domain/entities/Country";
 
 export class GetCountriesHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const name = c.req.query("name");
 
-    let filteredCountries = [...countries];
+    const countryRepository = AppDataSource.getRepository(Country);
+
+    let result = await countryRepository.find();
 
     if (name) {
-      filteredCountries = filteredCountries.filter((country) =>
+      result = result.filter((country) =>
         country.name.toLowerCase().includes(name.toLowerCase())
       );
     }
 
     return c.json({
       success: true,
-      data: filteredCountries,
+      data: result,
     });
   }
 }

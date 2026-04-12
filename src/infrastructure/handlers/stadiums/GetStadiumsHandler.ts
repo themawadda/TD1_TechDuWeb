@@ -1,14 +1,17 @@
 import { Context } from "hono";
-import { stadiums } from "@infrastructure/mock/stadiums";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Stadium } from "@domain/entities/Stadium";
 
 export class GetStadiumsHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const name = c.req.query("name");
     const cityName = c.req.query("city[name]");
     const countryName = c.req.query("country[name]");
     const countryCode = c.req.query("country[code]");
 
-    let result = [...stadiums];
+    const stadiumRepository = AppDataSource.getRepository(Stadium);
+
+    let result = await stadiumRepository.find();
 
     if (name) {
       result = result.filter((stadium) =>

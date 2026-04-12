@@ -1,24 +1,54 @@
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+
+@Entity()
 export class Country {
+  @PrimaryGeneratedColumn()
+  id!: number;
+
+  @Column()
+  name!: string;
+
+  @Column({ unique: true })
+  fifaCode!: string;
+
+  @Column()
+  confederation!: string;
+
+  @Column({ unique: true })
+  code!: string;
+
   constructor(
-    public readonly name: string,
-    public readonly fifaCode: string,
-    public readonly confederation: string,
-    public readonly code: string
+    name?: string,
+    fifaCode?: string,
+    confederation?: string,
+    code?: string
   ) {
-    if (!name.trim()) {
-      throw new Error("Country name is required");
+    if (name !== undefined) {
+      if (!name.trim()) {
+        throw new Error("Country name is required");
+      }
+      this.name = name;
     }
 
-    if (!/^[A-Z]{3}$/.test(fifaCode)) {
-      throw new Error("Invalid FIFA code");
+    if (fifaCode !== undefined) {
+      if (!/^[A-Z]{3}$/.test(fifaCode)) {
+        throw new Error("Invalid FIFA code");
+      }
+      this.fifaCode = fifaCode;
     }
 
-    if (!confederation.trim()) {
-      throw new Error("Confederation is required");
+    if (confederation !== undefined) {
+      if (!confederation.trim()) {
+        throw new Error("Confederation is required");
+      }
+      this.confederation = confederation;
     }
 
-    if (!/^[a-z]{2}$/.test(code)) {
-      throw new Error("Invalid country code");
+    if (code !== undefined) {
+      if (!/^[a-z]{2}$/.test(code)) {
+        throw new Error("Invalid country code");
+      }
+      this.code = code;
     }
   }
 }

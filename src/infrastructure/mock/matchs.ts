@@ -4,13 +4,13 @@ import { MatchStage } from "@domain/enums/MatchStage";
 import { stadiums } from "./stadiums";
 import { teams } from "./teams";
 
-const byId = (id: string) => teams.find((t) => t.id === id)!;
+const byFifaCode = (code: string) => teams.find((t) => t.fifaCode === code)!;
 
 export const matchs = [
   new Match(
     "m1",
-    byId("USA"),
-    byId("MEX"),
+    byFifaCode("USA"),
+    byFifaCode("MEX"),
     stadiums[1],
     MatchStatus.Scheduled,
     MatchStage.Group,
@@ -18,8 +18,8 @@ export const matchs = [
   ),
   new Match(
     "m2",
-    byId("FRA"),
-    byId("BRA"),
+    byFifaCode("CAN"),
+    byFifaCode("USA"),
     stadiums[0],
     MatchStatus.Scheduled,
     MatchStage.Group,
@@ -27,8 +27,8 @@ export const matchs = [
   ),
   new Match(
     "m3",
-    byId("MAR"),
-    byId("CAN"),
+    byFifaCode("MEX"),
+    byFifaCode("CAN"),
     stadiums[2],
     MatchStatus.Scheduled,
     MatchStage.Group,

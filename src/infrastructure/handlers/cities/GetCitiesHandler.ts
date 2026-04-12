@@ -1,21 +1,24 @@
 import { Context } from "hono";
-import { cities } from "@infrastructure/mock/cities";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { City } from "@domain/entities/City";
 
 export class GetCitiesHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const name = c.req.query("name");
 
-    let filteredCities = [...cities];
+    const cityRepository = AppDataSource.getRepository(City);
+
+    let result = await cityRepository.find();
 
     if (name) {
-      filteredCities = filteredCities.filter((city) =>
+      result = result.filter((city) =>
         city.name.toLowerCase().includes(name.toLowerCase())
       );
     }
 
     return c.json({
       success: true,
-      data: filteredCities,
+      data: result,
     });
   }
 }

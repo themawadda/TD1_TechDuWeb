@@ -1,22 +1,20 @@
 import { Context } from "hono";
-import { teams } from "@infrastructure/mock/teams";
+import { HTTPException } from "hono/http-exception";
+import { AppDataSource } from "@infrastructure/database/AppDataSource";
+import { Team } from "@domain/entities/Team";
 
 export class GetTeamsHandler {
-  handle(c: Context) {
+  async handle(c: Context) {
     const sort = c.req.query("sort");
     const name = c.req.query("name");
 
     if (sort && sort !== "name" && sort !== "-name") {
-      return c.json(
-        {
-          success: false,
-          message: "Invalid sort value",
-        },
-        400
-      );
+      throw new HTTPException(400, { message: "Invalid sort value" });
     }
 
-    let result = [...teams];
+    const teamRepository = AppDataSource.getRepository(Team);
+
+    let result = await teamRepository.find();
 
     if (name) {
       result = result.filter((team) =>
