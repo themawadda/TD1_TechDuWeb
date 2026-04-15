@@ -8,6 +8,7 @@ import { stadiumsRouter } from "./routes/stadiums";
 import { citiesRouter } from "./routes/cities";
 import { countriesRouter } from "./routes/countries";
 import { ticketsRouter } from "./routes/tickets";
+import { authRouter } from "./routes/auth";
 
 const app = new Hono();
 
@@ -39,5 +40,6 @@ app.route("/stadiums", stadiumsRouter);
 app.route("/cities", citiesRouter);
 app.route("/countries", countriesRouter);
 app.route("/tickets", ticketsRouter);
+app.route("/auth", authRouter);
 
 export { app };

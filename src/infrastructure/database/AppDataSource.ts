@@ -6,6 +6,7 @@ import { Stadium } from "@domain/entities/Stadium";
 import { Team } from "@domain/entities/Team";
 import { Match } from "@domain/entities/Match";
 import { Ticket } from "@domain/entities/Ticket";
+import { User } from "@domain/entities/User";
 
 export const AppDataSource = new DataSource({
   type: "mariadb",
@@ -16,5 +17,5 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME,
   synchronize: true,
   logging: false,
-  entities: [Country, City, Stadium, Team, Match, Ticket],
+  entities: [Country, City, Stadium, Team, Match, Ticket, User],
 });

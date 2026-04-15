@@ -5,13 +5,16 @@
     "seed": "bun run src/infrastructure/database/seed.ts"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "hono": "^4.12.3",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.22.0",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28",
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
