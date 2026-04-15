@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { matchs } from "@infrastructure/mock/matchs";
-import { MatchStage } from "@domain/enums/MatchStage";
+import { MatchStage } from "@domain/entities/MatchStage";
 
 export class GetMatchsByStageHandler {
   handle(c: Context) {

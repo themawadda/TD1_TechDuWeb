@@ -6,8 +6,8 @@ import {
 } from "typeorm";
 import { Stadium } from "./Stadium";
 import { Team } from "./Team";
-import { MatchStatus } from "../enums/MatchStatus";
-import { MatchStage } from "../enums/MatchStage";
+import { MatchStatus } from "./MatchStatus";
+import { MatchStage } from "./MatchStage";
 
 @Entity()
 export class Match {

@@ -11,7 +11,6 @@ import { ticketsRouter } from "./routes/tickets";
 
 const app = new Hono();
 
-// 🔥 centralized error handler
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
     return c.json(

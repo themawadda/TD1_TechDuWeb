@@ -1,6 +1,6 @@
 import { Match } from "@domain/entities/Match";
-import { MatchStatus } from "@domain/enums/MatchStatus";
-import { MatchStage } from "@domain/enums/MatchStage";
+import { MatchStatus } from "@domain/entities/MatchStatus";
+import { MatchStage } from "@domain/entities/MatchStage";
 import { stadiums } from "./stadiums";
 import { teams } from "./teams";
 

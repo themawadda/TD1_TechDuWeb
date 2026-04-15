@@ -3,7 +3,7 @@ import { HTTPException } from "hono/http-exception";
 import { AppDataSource } from "@infrastructure/database/AppDataSource";
 import { Match } from "@domain/entities/Match";
 import { FifaCode } from "@domain/value-objects/FifaCode";
-import { MatchStage } from "@domain/enums/MatchStage";
+import { MatchStage } from "@domain/entities/MatchStage";
 
 export class GetMatchsHandler {
   async handle(c: Context) {
