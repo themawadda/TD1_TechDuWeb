@@ -3,6 +3,7 @@ import { Ticket } from "@domain/entities/Ticket";
 import { Match } from "@domain/entities/Match";
 import { NotFoundError } from "@domain/errors/NotFoundError";
 import { ConflictError } from "@domain/errors/ConflictError";
+import { ValidationError } from "@domain/errors/ValidationError";
 
 export class TicketService {
   constructor(
@@ -46,5 +47,21 @@ export class TicketService {
     );
 
     return await this.ticketRepository.save(ticket);
+  }
+
+  async getTicketsByEmail(email: string): Promise<Ticket[]> {
+    if (!email.trim()) {
+      throw new ValidationError("Email is required");
+    }
+
+    const tickets = await this.ticketRepository.find({
+      where: { email },
+    });
+
+    if (tickets.length === 0) {
+      throw new NotFoundError("No tickets found for this email");
+    }
+
+    return tickets;
   }
 }
