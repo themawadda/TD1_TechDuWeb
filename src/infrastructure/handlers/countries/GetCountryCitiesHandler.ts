@@ -3,6 +3,8 @@ import { HTTPException } from "hono/http-exception";
 import { AppDataSource } from "@infrastructure/database/AppDataSource";
 import { Country } from "@domain/entities/Country";
 import { City } from "@domain/entities/City";
+import { CountryService } from "@application/services/CountryService";
+import { NotFoundError } from "@domain/errors/NotFoundError";
 
 export class GetCountryCitiesHandler {
   async handle(c: Context) {
@@ -11,23 +13,24 @@ export class GetCountryCitiesHandler {
     const countryRepository = AppDataSource.getRepository(Country);
     const cityRepository = AppDataSource.getRepository(City);
 
-    const country = await countryRepository.findOne({
-      where: { code },
-    });
+    const countryService = new CountryService(
+      countryRepository,
+      cityRepository
+    );
 
-    if (!country) {
-      throw new HTTPException(404, { message: "Country not found" });
+    try {
+      const cities = await countryService.getCountryCities(code);
+
+      return c.json({
+        success: true,
+        data: cities,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HTTPException(404, { message: error.message });
+      }
+
+      throw error;
     }
-
-    const result = await cityRepository.find({
-      where: {
-        country: { code },
-      },
-    });
-
-    return c.json({
-      success: true,
-      data: result,
-    });
   }
 }

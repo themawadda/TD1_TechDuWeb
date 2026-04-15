@@ -3,33 +3,34 @@ import { HTTPException } from "hono/http-exception";
 import { AppDataSource } from "@infrastructure/database/AppDataSource";
 import { Stadium } from "@domain/entities/Stadium";
 import { Match } from "@domain/entities/Match";
+import { StadiumService } from "@application/services/StadiumService";
+import { NotFoundError } from "@domain/errors/NotFoundError";
 
 export class GetStadiumMatchsHandler {
   async handle(c: Context) {
-    const nameParam = c.req.param("name").toLowerCase();
+    const nameParam = c.req.param("name");
 
     const stadiumRepository = AppDataSource.getRepository(Stadium);
     const matchRepository = AppDataSource.getRepository(Match);
 
-    const allStadiums = await stadiumRepository.find();
-    const stadium = allStadiums.find(
-      (stadium) => stadium.name.toLowerCase() === nameParam
+    const stadiumService = new StadiumService(
+      stadiumRepository,
+      matchRepository
     );
 
-    if (!stadium) {
-      throw new HTTPException(404, { message: "Stadium not found" });
+    try {
+      const matchs = await stadiumService.getStadiumMatchs(nameParam);
+
+      return c.json({
+        success: true,
+        data: matchs,
+      });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw new HTTPException(404, { message: error.message });
+      }
+
+      throw error;
     }
-
-    const allMatchs = await matchRepository.find();
-
-    const result = allMatchs.filter(
-      (match) =>
-        match.stadium.name.toLowerCase() === stadium.name.toLowerCase()
-    );
-
-    return c.json({
-      success: true,
-      data: result,
-    });
   }
 }

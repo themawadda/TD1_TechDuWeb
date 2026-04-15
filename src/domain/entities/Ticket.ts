@@ -6,12 +6,6 @@ import {
 } from "typeorm";
 import { Match } from "./Match";
 
-type Customer = {
-  firstname: string;
-  lastname: string;
-  email: string;
-};
-
 @Entity()
 export class Ticket {
   @PrimaryGeneratedColumn()
@@ -23,14 +17,22 @@ export class Ticket {
   @Column()
   seat!: string;
 
-  @Column("simple-json")
-  customer!: Customer;
+  @Column()
+  firstname!: string;
+
+  @Column()
+  lastname!: string;
+
+  @Column()
+  email!: string;
 
   constructor(
     id?: number,
     match?: Match,
     seat?: string,
-    customer?: Customer
+    firstname?: string,
+    lastname?: string,
+    email?: string
   ) {
     if (id !== undefined) {
       if (id <= 0) {
@@ -50,8 +52,16 @@ export class Ticket {
       this.seat = seat;
     }
 
-    if (customer !== undefined) {
-      this.customer = customer;
+    if (firstname !== undefined) {
+      this.firstname = firstname;
+    }
+
+    if (lastname !== undefined) {
+      this.lastname = lastname;
+    }
+
+    if (email !== undefined) {
+      this.email = email;
     }
   }
 }

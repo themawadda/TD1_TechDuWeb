@@ -2,36 +2,37 @@ import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { AppDataSource } from "@infrastructure/database/AppDataSource";
 import { Team } from "@domain/entities/Team";
-import { FifaCode } from "@domain/value-objects/FifaCode";
+import { TeamService } from "@application/services/TeamService";
+import { NotFoundError } from "@domain/errors/NotFoundError";
+import { ValidationError } from "@domain/errors/ValidationError";
 
 export class GetTeamByFifaCodeHandler {
   async handle(c: Context) {
-    const fifaCodeParam = c.req.param("fifaCode");
-
-    let fifaCode: FifaCode;
-
-    try {
-      fifaCode = new FifaCode(fifaCodeParam);
-    } catch {
-      throw new HTTPException(400, { message: "Invalid FIFA code" });
-    }
+    const fifaCode = c.req.param("fifaCode").toUpperCase();
 
     const teamRepository = AppDataSource.getRepository(Team);
+    const teamService = new TeamService(teamRepository);
 
-    const team = await teamRepository.findOne({
-      where: { fifaCode: fifaCode.value },
-    });
+    try {
+      const team = await teamService.getTeamByFifaCode(fifaCode);
 
-    if (!team) {
-      throw new HTTPException(404, { message: "Team not found" });
+      return c.json(
+        {
+          success: true,
+          data: team,
+        },
+        200
+      );
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        throw new HTTPException(400, { message: error.message });
+      }
+
+      if (error instanceof NotFoundError) {
+        throw new HTTPException(404, { message: error.message });
+      }
+
+      throw error;
     }
-
-    return c.json(
-      {
-        success: true,
-        data: team,
-      },
-      200
-    );
   }
 }
